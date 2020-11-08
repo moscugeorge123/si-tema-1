@@ -1,0 +1,24 @@
+{
+  "name": "tema-1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "KM": "node ./KM/index.js",
+    "A": "node ./A/index.js",
+    "B": "node ./B/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^7.12.1",
+    "nodemon": "^2.0.6"
+  },
+  "dependencies": {
+    "chalk": "^4.1.0",
+    "portfinder": "^1.0.28",
+    "prompt": "^1.0.0",
+    "websocket": "^1.0.32"
+  }
+}
