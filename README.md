@@ -1,6 +1,6 @@
 # SI tema 1 - Moscu George
 
-## Pentru a putea rula proiectul aveati nevoie de ultima versiunea LTS Node.js
+## Pentru a putea rula proiectul aveti nevoie de ultima versiune LTS Node.js
 https://nodejs.org/en/download/
 
 
@@ -49,6 +49,8 @@ Dupa deschiderea celor 3 endpoint-uri putem interationa doar cu 2 (A si B).
 ### In nodul A vom putea rula 2 comenzi:
 - `request <ofb|ecb>`, ex: `request ecb` - aceasta comanda cere nodului KM config-ul pentru ECB sau OFB. Le va trimite cand va primi request si de la nodul B
 - `send <path-to-file>`, ex: `send path/to/file.txt` - va trimite bucati criptate nodului b din fisierul dat ca parametru
+
+Fisierele trimise de nodul a se vor salva in `B/files`.
 
 ### In nodul B vom putea rula 2 comenzi:
 - `request <ofb|ecb>`, ex: `request ecb` - aceasta comanda cere nodului KM config-ul pentru ECB sau OFB. Le va trimite cand va primi request si de la nodul A
