@@ -8,14 +8,11 @@ https://nodejs.org/en/download/
 `npm install` sau mai pe scurt `npm i`, asta dupa ce ati instalat node.js
 
 
-### Pentru a rula serverul `KM`, executati urmatoarea comanda
-- `npm run KM`
+Pentru a rula serverul `KM`, executati urmatoarea comanda `npm run KM`
 
-### Pentru a rula serverul `A`, executati urmatoarea comanda
-- `npm run A`
+Pentru a rula serverul `A`, executati urmatoarea comanda `npm run A`
 
-### Pentru a rula serverul `B`, executati urmatoarea comanda
-- `npm run B`
+Pentru a rula serverul `B`, executati urmatoarea comanda `npm run B`
 
 
 ## Proiectul are urmatoarea structura
