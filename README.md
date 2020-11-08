@@ -3,12 +3,10 @@
 ## Pentru a putea rula proiectul aveati nevoie de ultima versiunea LTS Node.js
 https://nodejs.org/en/download/
 
----
 
 ## Pentru a instala proiectul executati comanda
 `npm install` sau mai pe scurt `npm i`, asta dupa ce ati instalat node.js
 
----
 
 ### Pentru a rula serverul `KM`, executati urmatoarea comanda
 - `npm run KM`
@@ -19,7 +17,6 @@ https://nodejs.org/en/download/
 ### Pentru a rula serverul `B`, executati urmatoarea comanda
 - `npm run B`
 
----
 
 ## Proiectul are urmatoarea structura
 
@@ -44,7 +41,6 @@ https://nodejs.org/en/download/
   - `utils.js` o colectie de functii helper pentru algoritmul AES si pentru transformarea datelor in bytes si invers
   - `index.js` fisierul export al fisirelor de mai sus
 
----
 
 ## Cum rulezi proiectul?
 
@@ -60,7 +56,6 @@ Dupa deschiderea celor 3 endpoint-uri putem interationa doar cu 2 (A si B).
 ### In nodul B vom putea rula 2 comenzi:
 - `request <ofb|ecb>`, ex: `request ecb` - aceasta comanda cere nodului KM config-ul pentru ECB sau OFB. Le va trimite cand va primi request si de la nodul A
 
----
 
 ## Tehnologii folosite
 - Javascript (server side)
