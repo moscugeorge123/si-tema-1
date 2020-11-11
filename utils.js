@@ -41,12 +41,12 @@ function validateCommand(command) {
   }
 
   if (!actions.includes(action)) {
-    console.log(`"${action}" is not a valid action`);
+    console.log(color.red(`"${action}" is not a valid action`));
     return;
   }
 
   if (action === 'request' && !isRequestInit(command)) {
-    console.log(`"request" should be called without "ecb" or "ofb" as parameter`);
+    console.log(color.red(`"request" should be called with "ecb" or "ofb" as parameter`));
     return;
   }
 
@@ -71,7 +71,7 @@ function command(callback) {
 
 function isRequestInit(command) {
   const [c, enc] = command.split(' ');
-  return ['ecb', 'ofb'].includes(enc.trim()) && c === 'request';
+  return ['ecb', 'ofb'].includes(enc?.trim()) && c === 'request';
 }
 
 function isSendFile(command) {
@@ -81,18 +81,18 @@ function isSendFile(command) {
   }
 
   if (!file) {
-    console.log(`"send" should have a path file as parameter`);
+    console.log(color.red(`"send" should have a path file as parameter`));
     return;
   }
 
   if (!fs.existsSync(file)) {
-    console.log(`"${file}" does not exists`);
+    console.log(color.red(`"${file}" does not exists`));
     return;
   }
 
   const stat = fs.statSync(file);
   if (!stat.isFile()) {
-    console.log(`"${file}" should be a file`);
+    console.log(color.red(`"${file}" should be a file`));
     return;
   }
 

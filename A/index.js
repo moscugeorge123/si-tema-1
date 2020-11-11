@@ -61,6 +61,7 @@ let listeningOnKM = true;
           return;
         }
       } catch (error) {
+        command(processCommands);
         console.log('ERROR ON DECRYPTION');
         console.log(error);
       }
@@ -90,6 +91,7 @@ let listeningOnKM = true;
 
     command(requestInit);
   } catch (error) {
+    command(processCommands);
     console.log(error);
   }
 })();
@@ -134,8 +136,8 @@ async function handleSendFile(command) {
     const data = await fs.promises.readFile(file);
     BClient.fileData = Array.from(new Uint8Array(data));
     BClient.fileStart = -1;
-    BClient.chunkSize = 16;
-    // BClient.chunkSize = 1024 * 16;
+    // BClient.chunkSize = 16;
+    BClient.chunkSize = 128 * 16;
     BClient.fileName = file;
     BClient.sentChunks = 0;
 
@@ -164,7 +166,7 @@ function sendChunk() {
   const chunk = fileData.slice(fileStart, fileStart + size);
   BClient.fileStart += size;
   BClient.sentChunks++;
-  sendToBClient({ file, chunk, type: 'chunk' });
+  sendToBClient({ file, chunk, type: 'chunk', all: false });
 
   console.log(chunk);
 

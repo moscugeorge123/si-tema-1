@@ -5,6 +5,7 @@ const { A, B, OFB: o, ECB: e, shared } = configs;
 const { OFB, ECB, hex, utf8 } = require('./aes');
 const fs = require('fs');
 const path = require('path');
+const color = require('chalk');
 
 class Server {
   constructor(type = 'KM') {
@@ -21,7 +22,7 @@ class Server {
       this._handleRequests();
 
       resolve();
-      console.log(`Server opened on port: ${this._config.port}`);
+      console.log(color.greenBright(`Server opened on port: ${this._config.port}`));
     });
 
     server.on('error', error => {
@@ -32,27 +33,27 @@ class Server {
   _handleRequests() {
     this.socket.on('request', request => {
       if (!this.AConnection && request.origin === `endpoint-${A.port}`) {
-        console.log('Connected from origin: ', request.origin);
+        console.log(color.green('Connected from origin: ', request.origin));
         this.AConnection = request.accept(null, request.origin);
         this._handleIncomingMessages();
         return;
       }
       
       if (!this.BConnection && request.origin === `endpoint-${B.port}`) {
-        console.log('Connected from origin: ', request.origin);
+        console.log(color.green('Connected from origin: ', request.origin));
         this.BConnection = request.accept(null, request.origin);
         this._handleIncomingMessages();
         return;
       }
       
       if (!this.dataClient && request.origin === 'origin-data-client') {
-        console.log('Connected from origin: ', request.origin);
+        console.log(color.green('Connected from origin: ', request.origin));
         this.dataClient = request.accept(null, request.origin);
         return;
       }
 
       request.reject(401, 'Not a requested client');
-      console.log('Rejected origin: ', request.origin);
+      console.log(color.red('Rejected origin: ', request.origin));
     });
   }
 
@@ -79,6 +80,7 @@ class Server {
 
       if (this.mod['A'] && this.mod['B']) {
         this.mod = {};
+        this.oldEncryptionConfig = this.encryptionConfig;
       }
       
       if (!this.mod['A'] && from === 'A') {
@@ -101,14 +103,14 @@ class Server {
         this.encryption = mod;
         this.encryptionConfig = response;
 
-        console.log(this.mod, this.encryptionConfig);
+        console.log(color.blue(`Sending chosen encryption: ${response.chosenEnc}`));
 
         if (withEnc && this.encryptionConfig) {
           this.AConnection.sendBytes(Buffer.from(
             this._encryptMessage(JSON.stringify(response))
           ))
           this.BConnection.sendBytes(Buffer.from(
-            this._encryptMessage(JSON.stringify(response))
+            this._encryptMessage(JSON.stringify(response), true)
           ))
         } else {
           const encryptedResponse = this._encryptECB(
@@ -135,14 +137,15 @@ class Server {
         };
 
         this.encryptionConfig = response;
-        console.log(this.mod, this.encryptionConfig);
-        
+
+        console.log(color.blue(`Sending chosen encryption: ${response.chosenEnc}`));
+
         if (withEnc && this.encryptionConfig) {
           this.AConnection.sendBytes(Buffer.from(
             this._encryptMessage(JSON.stringify(response))
           ))
           this.BConnection.sendBytes(Buffer.from(
-            this._encryptMessage(JSON.stringify(response))
+            this._encryptMessage(JSON.stringify(response), true)
           ))
         } else {
           const encryptedResponse = this._encryptECB(
@@ -173,7 +176,7 @@ class Server {
       if (a !== 'A') { [b, a] = [a, b]; }
       if (a !== 'A') { return; }
 
-      console.log('Confirming %s %s', a, b);
+      console.log(color.green('Confirming', a, b));
 
       this.confirmations = undefined;
       this.AConnection.sendBytes(Buffer.from(
@@ -225,12 +228,14 @@ class Server {
             }))
           ))
 
+          console.log(color.yellow('Sending 10 chunks confirmation to continue...'))
+
           this.ten = undefined;
           return;
         }
 
         if (decrypted === 'finish') {
-          console.log('Finish message from:', from);
+          console.log(color.blue('Finish message from:', from));
           return;
         }
       } catch (error) {
@@ -261,10 +266,14 @@ class Server {
   }
 
   _handleBIncomeMessages() {
-    const handleChunks = ({ chunk, file }) => {
+    const handleChunks = ({ chunk, file }, all) => {
+      let decryptedChunk = chunk;
+      if (all) {
+        decryptedChunk = this._decryptMessage(new Uint8Array(chunk), false);
+      }
       fs.promises.appendFile(
         path.join('./files', file),
-        new Uint8Array(chunk),
+        all ? decryptedChunk : new Uint8Array(chunk),
       ).then(r => {
         console.log(chunk);
 
@@ -329,7 +338,7 @@ class Server {
         }
 
         if (data.type === 'chunk') {
-          handleChunks(data);
+          handleChunks(data, data.all);
           return;
         }
 
@@ -373,8 +382,17 @@ class Server {
     return ecb.encrypt(message);
   }
 
-  _encryptMessage(message) {
-    const { chosenEnc, key, iv } = this.encryptionConfig;
+  _encryptMessage(message, emptyOldConfig = false) {
+    let { chosenEnc, key, iv } = this.encryptionConfig;
+
+    if (this.oldEncryptionConfig) {
+      ({ chosenEnc, key, iv } = this.oldEncryptionConfig);
+
+      if (emptyOldConfig) {
+        this.oldEncryptionConfig = null;
+      }
+    }
+
     const EncClass = chosenEnc === 'OFB' ? OFB : ECB;
     const enc = new EncClass(
       hex.toBytes(key),
@@ -384,7 +402,7 @@ class Server {
     return enc.encrypt(utf8.toBytes(message));
   }
 
-  _decryptMessage(message) {
+  _decryptMessage(message, u = true) {
     const { chosenEnc, key, iv } = this.encryptionConfig;
     const EncClass = chosenEnc === 'OFB' ? OFB : ECB;
     const enc = new EncClass(
@@ -394,8 +412,9 @@ class Server {
 
     const bytes = new Uint8Array(message);
     const decrypted = enc.decrypt(bytes);
-    const utf = utf8.fromBytes(decrypted);
-    return utf;
+    return u ? utf8.fromBytes(decrypted) : decrypted;
+    // const utf = utf8.fromBytes(decrypted);
+    // return utf;
   }
 
   sendUTF(message, connection) {

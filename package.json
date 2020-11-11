@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "KM": "node ./KM/index.js",
-    "A": "node ./A/index.js",
-    "B": "node ./B/index.js",
+    "KM": "cd ./KM && node index.js",
+    "A": "cd ./A && node index.js",
+    "B": "cd ./B && node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

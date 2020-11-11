@@ -53,6 +53,7 @@ let listeningOnKM = true;
         }
 
       } catch (error) {
+        command(processCommands);
         console.log('ERROR ON DECRYPTION');
         console.log(error);
       }
